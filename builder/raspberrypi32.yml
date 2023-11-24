@@ -114,6 +114,7 @@
           - wpasupplicant
         install:
           - autoconf
+          - aircrack-ng
           - bc
           - bison
           - bluez
@@ -170,6 +171,7 @@
           - libsleef-dev
           - libsqlite3-dev
           - libssl-dev
+          - libcurl4-openssl-dev
           - libswscale5
           - libtiff5
           - libtool
