@@ -451,6 +451,15 @@
             /usr/bin/tvservice -o
           fi
 
+    # Add iw reg set US to rc.local to prevent "Set Channel failed"
+    - name: add WiFi regulatory infomation
+      replace:
+        destfile: /etc/rc.local
+        regexp: "Print the IP address"
+        replace: "Asif - Set WiFi regulatory infomation\niw reg set US\n\n# Print the IP address"
+      ignore_errors: yes
+
+
     - name: create /etc/pwnagotchi folder
       file:
         path: /etc/pwnagotchi
