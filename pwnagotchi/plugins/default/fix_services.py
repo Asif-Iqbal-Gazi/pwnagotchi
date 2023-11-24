@@ -34,8 +34,8 @@ class FixServices(plugins.Plugin):
 
     def __init__(self):
         self.options = dict()
-        self.pattern = re.compile(r'brcmf_cfg80211_nexmon_set_channel.*?Set Channel failed')
-        self.pattern2 = re.compile(r'wifi error while hopping to channel')
+        self.pattern = re.compile(r'brcmf_cfg80211_nexmon_set_channel.*?Set Channel failed')    # Happens when you disconnect the bluetooth (May be because of the internet plugin)
+        self.pattern2 = re.compile(r'wifi error while hopping to channel')                      # iw reg set US will fix this (Do we still need it ?)
         self.pattern3 = re.compile(r'Firmware has halted or crashed')
         self.pattern4 = re.compile(r'error 400: could not find interface wlan0mon')
         self.isReloadingMon = False
