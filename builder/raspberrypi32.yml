@@ -243,6 +243,21 @@
         path: '{{ pwnagotchi.custom_plugin_dir }}'
         state: directory
 
+    ## Set regulatory information
+    - name: set crda
+      replace:
+        destfile: /etc/default/crda
+        regexp: "REGDOMAIN="
+        replace: "REGDOMAIN=US"
+      ignore_errors: yes
+
+    - name: regdomain
+      replace:
+        destfile: /lib/crda/setregdomain
+        regexp: "REGDOMAIN="
+        replace: "REGDOMAIN=US"
+      ignore_errors: yes
+
     - name: update apt package cache
       apt:
         update_cache: yes
@@ -257,6 +272,37 @@
       args:
         executable: /bin/bash
         chdir: /usr/local/src
+
+    ###########################################
+    #					                                #
+    # hcxtools 6.2.7 -- build from source     #
+    #					                                #
+    ###########################################
+    - name: Create the directory to store the release
+      ansible.builtin.file:
+        path: /tmp/hcx
+        state: directory
+
+    - name: Download GitHub release zip
+      ansible.builtin.get_url:
+        url: "https://github.com/ZerBea/hcxtools/archive/refs/tags/6.2.7.zip"
+        dest: "/tmp/hcx/release.zip"
+
+    - name: Unzip the release
+      ansible.builtin.unarchive:
+        src: "/tmp/hcx/release.zip"
+        dest: "/tmp/hcx"
+        remote_src: yes
+
+    - name: Run make command
+      ansible.builtin.command:
+        cmd: "make"
+        chdir: "/tmp/hcx/hcxtools-6.2.7"
+
+    - name: Run make install command
+      ansible.builtin.command:
+        cmd: "make install"
+        chdir: "/tmp/hcx/hcxtools-6.2.7"
 
     ###########################################
     #
@@ -328,7 +374,7 @@
 
     - name: clone pwnagotchi repository
       git:
-        repo: https://github.com/jayofelony/pwnagotchi-torch.git
+        repo: https://github.com/Asif-Iqbal-Gazi/pwnagotchi.git
         dest: /usr/local/src/pwnagotchi
       register: pwnagotchigit
 
