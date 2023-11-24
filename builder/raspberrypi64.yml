@@ -71,6 +71,7 @@
           - wpasupplicant
         install:
           - autoconf
+          - aircrack-ng
           - bc
           - bison
           - bluez
@@ -123,6 +124,7 @@
           - libraspberrypi0
           - libsqlite3-dev
           - libssl-dev
+          - libcurl4-openssl-dev
           - libswscale5
           - libtiff5
           - libtool
@@ -191,6 +193,21 @@
         regexp: "^CONF_SWAPSIZE=.*$"
         line: "CONF_SWAPSIZE=2048"
 
+    ## Set regulatory information
+    - name: set crda
+      replace:
+        destfile: /etc/default/crda
+        regexp: "REGDOMAIN="
+        replace: "REGDOMAIN=US"
+      ignore_errors: yes
+
+    - name: regdomain
+      replace:
+        destfile: /lib/crda/setregdomain
+        regexp: "REGDOMAIN="
+        replace: "REGDOMAIN=US"
+      ignore_errors: yes
+
     - name: install packages
       apt:
         name: "{{ packages.apt.install }}"
@@ -230,6 +247,37 @@
         src: /usr/local/lib/libpcap.so.1.9.1
         dest: /usr/local/lib/libpcap.so.0.8
         state: link
+
+    ###########################################
+    #					                                #
+    # hcxtools 6.2.7 -- build from source     #
+    #					                                #
+    ###########################################
+    - name: Create the directory to store the release
+      ansible.builtin.file:
+        path: /tmp/hcx
+        state: directory
+
+    - name: Download GitHub release zip
+      ansible.builtin.get_url:
+        url: "https://github.com/ZerBea/hcxtools/archive/refs/tags/6.2.7.zip"
+        dest: "/tmp/hcx/release.zip"
+
+    - name: Unzip the release
+      ansible.builtin.unarchive:
+        src: "/tmp/hcx/release.zip"
+        dest: "/tmp/hcx"
+        remote_src: yes
+
+    - name: Run make command
+      ansible.builtin.command:
+        cmd: "make"
+        chdir: "/tmp/hcx/hcxtools-6.2.7"
+
+    - name: Run make install command
+      ansible.builtin.command:
+        cmd: "make install"
+        chdir: "/tmp/hcx/hcxtools-6.2.7"
 
     # Install nexmon to fix wireless scanning (takes 2.5G of space)
     - name: clone nexmon repository
@@ -328,7 +376,7 @@
 
     - name: clone pwnagotchi repository
       git:
-        repo: https://github.com/jayofelony/pwnagotchi.git
+        repo: https://github.com/Asif-Iqbal-Gazi/pwnagotchi.git
         dest: /usr/local/src/pwnagotchi
       register: pwnagotchigit
 
@@ -447,6 +495,14 @@
           if ! /usr/bin/tvservice -s | egrep 'HDMI|DVI'; then
             /usr/bin/tvservice -o
           fi
+
+    # Add iw reg set US to rc.local to prevent "Set Channel failed"
+    - name: add WiFi regulatory infomation
+      replace:
+        destfile: /etc/rc.local
+        regexp: "Print the IP address"
+        replace: "Asif - Set WiFi regulatory infomation\niw reg set US\n\n# Print the IP address"
+      ignore_errors: yes
 
     - name: create /etc/pwnagotchi folder
       file:
