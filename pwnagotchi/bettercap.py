@@ -11,7 +11,7 @@ import pwnagotchi
 
 requests.adapters.DEFAULT_RETRIES = 5 # increase retries number
 
-ping_timeout = 180
+ping_timeout  = 180
 ping_interval = 15
 max_queue = 10000
 

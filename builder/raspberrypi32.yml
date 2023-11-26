@@ -75,6 +75,7 @@
         - ifup@wlan0.service
         - triggerhappy.service
         - wpa_supplicant.service
+        - dnsmasq.service
     packages:
       caplets:
         source: "https://github.com/jayofelony/caplets.git"

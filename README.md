@@ -1,19 +1,3 @@
-# Pwnagotchi-Torch
-<a href="https://github.com/jayofelony/pwnagotchi/releases/latest"><img alt="Release" src="https://img.shields.io/github/release/jayofelony/pwnagotchi.svg"></a><br/>
-**This fork of [Pwnagotchi](https://www.pwnagotchi.ai) now works on **ALL** Raspberry Pi's that have built-in Wi-Fi.**
-
-**Use RPi imager to flash, if you want you can set a custom user/pass to ssh in.**
-
-Default SSH credentials are pi/raspberry and for Orange Pi pi/orange
-
-# Donations: 
-
-[Pwnagotchi-Torch](https://www.patreon.com/pwnagotchi_torch)
-
-[GH Sponsor](https://github.com/sponsors/jayofelony)
-
----
-
 [Pwnagotchi](https://pwnagotchi.ai/) is an [A2C](https://hackernoon.com/intuitive-rl-intro-to-advantage-actor-critic-a2c-4ff545978752)-based "AI" leveraging [bettercap](https://www.bettercap.org/) that learns from its surrounding Wi-Fi environment to maximize the crackable WPA key material it captures (either passively, or by performing authentication and association attacks). This material is collected as PCAP files containing any form of handshake supported by [hashcat](https://hashcat.net/hashcat/), including [PMKIDs](https://www.evilsocket.net/2019/02/13/Pwning-WiFi-networks-with-bettercap-and-the-PMKID-client-less-attack/), 
 full and half WPA handshakes.
 

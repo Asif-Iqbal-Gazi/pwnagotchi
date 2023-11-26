@@ -236,13 +236,19 @@ def load_config(args):
                 config = merge_config(additional_config, config)
 
     # the very first step is to normalize the display name, so we don't need dozens of if/elif around
-    if config['ui']['display']['type'] in ('inky', 'inkyphat'):
+    if config['ui']['display']['type'] in ('ws_3', 'ws3', 'waveshare_3', 'waveshare3'):
+        config['ui']['display']['type'] = 'waveshare_3'
+
+    elif config['ui']['display']['type'] in ('ws_4', 'ws4', 'waveshare_4', 'waveshare4'):
+        config['ui']['display']['type'] = 'waveshare_4'
+
+    elif config['ui']['display']['type'] in ('inky', 'inkyphat'):
         config['ui']['display']['type'] = 'inky'
 
     elif config['ui']['display']['type'] in ('papirus', 'papi'):
         config['ui']['display']['type'] = 'papirus'
 
-    elif config['ui']['display']['type'] in 'oledhat':
+    elif config['ui']['display']['type'] in ('oledhat',):
         config['ui']['display']['type'] = 'oledhat'
 
     elif config['ui']['display']['type'] in ('ws_1', 'ws1', 'waveshare_1', 'waveshare1'):
@@ -251,16 +257,16 @@ def load_config(args):
     elif config['ui']['display']['type'] in ('ws_2', 'ws2', 'waveshare_2', 'waveshare2'):
         config['ui']['display']['type'] = 'waveshare_2'
 
-    elif config['ui']['display']['type'] in ('ws_3', 'ws3', 'waveshare_3', 'waveshare3'):
-        config['ui']['display']['type'] = 'waveshare_3'
-
     elif config['ui']['display']['type'] in ('ws_27inch', 'ws27inch', 'waveshare_27inch', 'waveshare27inch'):
         config['ui']['display']['type'] = 'waveshare27inch'
+
+    elif config['ui']['display']['type'] in ('ws_27inchv2', 'ws27inchv2', 'waveshare_27inchv2', 'waveshare27inchv2'):
+        config['ui']['display']['type'] = 'waveshare27inchv2'
 
     elif config['ui']['display']['type'] in ('ws_29inch', 'ws29inch', 'waveshare_29inch', 'waveshare29inch'):
         config['ui']['display']['type'] = 'waveshare29inch'
 
-    elif config['ui']['display']['type'] in 'lcdhat':
+    elif config['ui']['display']['type'] in ('lcdhat',):
         config['ui']['display']['type'] = 'lcdhat'
 
     elif config['ui']['display']['type'] in ('dfrobot_1', 'df1'):
@@ -280,7 +286,7 @@ def load_config(args):
 
     elif config['ui']['display']['type'] in ('ws_213bc', 'ws213bc', 'waveshare_213bc', 'waveshare213bc'):
         config['ui']['display']['type'] = 'waveshare213bc'
-    
+
     elif config['ui']['display']['type'] in ('ws_213bv4', 'ws213bv4', 'waveshare_213bv4', 'waveshare213inb_v4'):
         config['ui']['display']['type'] = 'waveshare213inb_v4'
 
