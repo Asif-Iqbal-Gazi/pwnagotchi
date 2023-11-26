@@ -1,18 +1,18 @@
-#!/usr/bin/python3
-import logging
-import argparse
 import time
 import signal
 import sys
 import toml
+import requests
+import os
 
 import pwnagotchi
 from pwnagotchi import utils
+from pwnagotchi.google import cmd as google_cmd
 from pwnagotchi.plugins import cmd as plugins_cmd
 from pwnagotchi import log
 from pwnagotchi import restart
 from pwnagotchi import fs
-from pwnagotchi.utils import DottedTomlEncoder
+from pwnagotchi.utils import DottedTomlEncoder, parse_version as version_to_tuple
 
 
 def do_clear(display):
@@ -76,7 +76,7 @@ def do_auto_mode(agent):
             # From Pwnagotchi's perspective, the more new access points
             # and / or client stations nearby, the longer one epoch of
             # its relative time will take ... basically, in Pwnagotchi's universe,
-            # WiFi electromagnetic fields affect time like gravitational fields
+            # Wi-Fi electromagnetic fields affect time like gravitational fields
             # affect ours ... neat ^_^
             agent.next_epoch()
 
@@ -92,10 +92,19 @@ def do_auto_mode(agent):
             else:
                 logging.exception("main loop exception (%s)", e)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser = plugins_cmd.add_parsers(parser)
 
+if __name__ == '__main__':
+    def add_parsers(parser):
+        """
+        Adds the plugins and google subcommands
+        """
+        subparsers = parser.add_subparsers()
+
+        # Add parsers from plugins_cmd
+        plugins_cmd.add_parsers(subparsers)
+
+    parser = argparse.ArgumentParser(prog="pwnagotchi")
+    # pwnagotchi --help
     parser.add_argument('-C', '--config', action='store', dest='config', default='/etc/pwnagotchi/default.toml',
                         help='Main configuration file.')
     parser.add_argument('-U', '--user-config', action='store', dest='user_config', default='/etc/pwnagotchi/config.toml',
@@ -117,14 +126,20 @@ if __name__ == '__main__':
     parser.add_argument('--print-config', dest="print_config", action="store_true", default=False,
                         help="Print the configuration.")
 
+    # pwnagotchi plugins --help
+    add_parsers(parser)
     args = parser.parse_args()
 
-
     if plugins_cmd.used_plugin_cmd(args):
-      config = utils.load_config(args)
-      log.setup_logging(args, config)
-      rc = plugins_cmd.handle_cmd(args, config)
-      sys.exit(rc)
+        config = utils.load_config(args)
+        log.setup_logging(args, config)
+        rc = plugins_cmd.handle_cmd(args, config)
+        sys.exit(rc)
+    if google_cmd.used_google_cmd(args):
+        config = utils.load_config(args)
+        log.setup_logging(args, config)
+        rc = google_cmd.handle_cmd(args)
+        sys.exit(rc)
 
     if args.version:
         print(pwnagotchi.__version__)
