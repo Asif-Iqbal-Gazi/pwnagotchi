@@ -1,13 +1,14 @@
+#!/usr/bin/python3
+import logging
+import argparse
 import time
 import signal
 import sys
 import toml
-import requests
 import os
 
 import pwnagotchi
 from pwnagotchi import utils
-from pwnagotchi.google import cmd as google_cmd
 from pwnagotchi.plugins import cmd as plugins_cmd
 from pwnagotchi import log
 from pwnagotchi import restart
@@ -76,7 +77,7 @@ def do_auto_mode(agent):
             # From Pwnagotchi's perspective, the more new access points
             # and / or client stations nearby, the longer one epoch of
             # its relative time will take ... basically, in Pwnagotchi's universe,
-            # Wi-Fi electromagnetic fields affect time like gravitational fields
+            # WiFi electromagnetic fields affect time like gravitational fields
             # affect ours ... neat ^_^
             agent.next_epoch()
 
@@ -134,11 +135,6 @@ if __name__ == '__main__':
         config = utils.load_config(args)
         log.setup_logging(args, config)
         rc = plugins_cmd.handle_cmd(args, config)
-        sys.exit(rc)
-    if google_cmd.used_google_cmd(args):
-        config = utils.load_config(args)
-        log.setup_logging(args, config)
-        rc = google_cmd.handle_cmd(args)
         sys.exit(rc)
 
     if args.version:

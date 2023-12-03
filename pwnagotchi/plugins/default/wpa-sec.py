@@ -43,6 +43,7 @@ class WpaSec(plugins.Plugin):
             except requests.exceptions.RequestException as req_e:
                 raise req_e
 
+
     def _download_from_wpasec(self, output, timeout=30):
         """
         Downloads the results from wpasec and safes them to output
@@ -63,6 +64,7 @@ class WpaSec(plugins.Plugin):
             raise req_e
         except OSError as os_e:
             raise os_e
+
 
     def on_loaded(self):
         """
@@ -130,8 +132,7 @@ class WpaSec(plugins.Plugin):
                 cracked_file = os.path.join(handshake_dir, 'wpa-sec.cracked.potfile')
                 if os.path.exists(cracked_file):
                     last_check = datetime.fromtimestamp(os.path.getmtime(cracked_file))
-                    download_interval = int(self.options['download_interval'])
-                    if last_check is not None and ((datetime.now() - last_check).seconds / download_interval) < 1:
+                    if last_check is not None and ((datetime.now() - last_check).seconds / (60 * 60)) < 1:
                         return
                 try:
                     self._download_from_wpasec(os.path.join(handshake_dir, 'wpa-sec.cracked.potfile'))
@@ -140,3 +141,4 @@ class WpaSec(plugins.Plugin):
                     logging.debug("WPA_SEC: %s", req_e)
                 except OSError as os_e:
                     logging.debug("WPA_SEC: %s", os_e)
+

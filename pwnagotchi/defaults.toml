@@ -12,8 +12,8 @@ main.custom_plugin_repos = [
 
 main.custom_plugins = "/usr/local/share/pwnagotchi/custom-plugins/"
 
-main.plugins.auto-update.enabled = true
-main.plugins.auto-update.install = true
+main.plugins.auto-update.enabled = false
+main.plugins.auto-update.install = false
 main.plugins.auto-update.interval = 3600
 
 main.plugins.bt-tether.enabled = false
@@ -42,11 +42,6 @@ main.plugins.bt-tether.devices.ios-phone.priority = 999
 
 main.plugins.fix_services.enabled = false
 
-main.plugins.gdrivesync.enabled = false
-main.plugins.gdrivesync.backupfiles = ['']
-main.plugins.gdrivesync.backup_folder = "PwnagotchiBackups"
-main.plugin.gdrivesync.interval = 1
-
 main.plugins.gpio_buttons.enabled = false
 
 main.plugins.gps.enabled = false
@@ -62,7 +57,7 @@ main.plugins.grid.exclude = [
 main.plugins.logtail.enabled = true
 main.plugins.logtail.max-lines = 10000
 
-main.plugins.memtemp.enabled = false
+main.plugins.memtemp.enabled = true
 main.plugins.memtemp.scale = "celsius"
 main.plugins.memtemp.orientation = "horizontal"
 
@@ -78,20 +73,9 @@ main.plugins.onlinehashcrack.whitelist = []
 main.plugins.paw-gps.enabled = false
 main.plugins.paw-gps.ip = "192.168.44.1:8080"
 
-main.plugins.pisugar2.enabled = false
-main.plugins.pisugar2.shutdown = 5
-main.plugins.pisugar2.sync_rtc_on_boot = false
-
 main.plugins.session-stats.enabled = true
 main.plugins.session-stats.save_directory = "/var/tmp/pwnagotchi/sessions/"
 
-main.plugins.ups_hat_c.enabled = false
-main.plugins.ups_hat_c.label_on = true  # show BAT label or just percentage
-main.plugins.ups_hat_c.shutdown = 5  # battery percent at which the device will turn off
-main.plugins.ups_hat_c.bat_x_coord = 140
-main.plugins.ups_hat_c.bat_y_coord = 0
-
-main.plugins.ups_lite.enabled = false
 main.plugins.ups_lite.shutdown = 2
 
 main.plugins.webcfg.enabled = true

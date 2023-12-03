@@ -18,7 +18,7 @@ if ! check_brcm; then
   sleep 10
 fi
 
-# start mon0
+# start wlan0mon
 start_monitor_interface
 
 if is_auto_mode_no_delete; then
