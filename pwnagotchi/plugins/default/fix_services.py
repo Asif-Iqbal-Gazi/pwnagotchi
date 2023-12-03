@@ -37,7 +37,7 @@ class FixServices(plugins.Plugin):
         self.pattern = re.compile(r'brcmf_cfg80211_nexmon_set_channel.*?Set Channel failed')    # Happens when you disconnect the bluetooth (May be because of the internet plugin)
         self.pattern2 = re.compile(r'wifi error while hopping to channel')                      # iw reg set US will fix this (Do we still need it ?)
         self.pattern3 = re.compile(r'Firmware has halted or crashed')
-        self.pattern4 = re.compile(r'error 400: could not find interface wlan0mon')
+        self.pattern4 = re.compile(r'error 400: could not find interface mon0')
         self.isReloadingMon = False
         self.connection = None
         self.LASTTRY = 0
@@ -55,10 +55,10 @@ class FixServices(plugins.Plugin):
         last_lines = ''.join(list(TextIOWrapper(subprocess.Popen(['journalctl', '-n10', '-k'],
                                                                  stdout=subprocess.PIPE).stdout))[-10:])
         try:
-            cmd_output = subprocess.check_output("ip link show wlan0mon", shell=True)
-            logging.info("[Fix_Services ip link show wlan0mon]: %s" % repr(cmd_output))
+            cmd_output = subprocess.check_output("ip link show mon0", shell=True)
+            logging.info("[Fix_Services ip link show mon0]: %s" % repr(cmd_output))
             if ",UP," in str(cmd_output):
-                logging.info("wlan0mon is up.")
+                logging.info("mon0 is up.")
                 self._status = "up"
 
             if len(self.pattern.findall(last_lines)) >= 3:
@@ -78,7 +78,7 @@ class FixServices(plugins.Plugin):
                 self._status = ""
 
         except Exception as err:
-            logging.error("[Fix_Services ip link show wlan0mon]: %s" % repr(err))
+            logging.error("[Fix_Services ip link show mon0]: %s" % repr(err))
             try:
                 self._status = "xx"
                 self._tryTurningItOffAndOnAgain(agent)
@@ -127,7 +127,7 @@ class FixServices(plugins.Plugin):
 
             # Look for pattern 1
             if len(self.pattern.findall(last_lines)) >= 3:
-                logging.info("[Fix_Services]**** Should trigger a reload of the wlan0mon device:\n%s" % last_lines)
+                logging.info("[Fix_Services]**** Should trigger a reload of the mon0 device:\n%s" % last_lines)
                 if hasattr(agent, 'view'):
                     display = agent.view()
                     display.set('status', 'Blind-Bug detected. Restarting.')
@@ -140,7 +140,7 @@ class FixServices(plugins.Plugin):
 
             # Look for pattern 2
             elif len(self.pattern2.findall(other_last_lines)) >= 5:
-                logging.info("[Fix_Services]**** Should trigger a reload of the wlan0mon device:\n%s" % last_lines)
+                logging.info("[Fix_Services]**** Should trigger a reload of the mon0 device:\n%s" % last_lines)
                 if hasattr(agent, 'view'):
                     display = agent.view()
                     display.set('status', 'Wifi channel stuck. Restarting recon.')
@@ -165,13 +165,13 @@ class FixServices(plugins.Plugin):
 
             # Look for pattern 3
             elif len(self.pattern3.findall(other_last_lines)) >= 1:
-                logging.info("[Fix_Services] Firmware has halted or crashed. Restarting wlan0mon.")
+                logging.info("[Fix_Services] Firmware has halted or crashed. Restarting mon0.")
                 if hasattr(agent, 'view'):
                     display = agent.view()
-                    display.set('status', 'Firmware has halted or crashed. Restarting wlan0mon.')
+                    display.set('status', 'Firmware has halted or crashed. Restarting mon0.')
                     display.update(force=True)
                 try:
-                    # Run the monstart command to restart wlan0mon
+                    # Run the monstart command to restart mon0
                     cmd_output = subprocess.check_output("monstart", shell=True)
                     logging.info("[Fix_Services monstart]: %s" % repr(cmd_output))
                 except Exception as err:
@@ -185,7 +185,7 @@ class FixServices(plugins.Plugin):
                     display.set('status', 'Restarting wlan0 now!')
                     display.update(force=True)
                 try:
-                    # Run the monstart command to restart wlan0mon
+                    # Run the monstart command to restart mon0
                     cmd_output = subprocess.check_output("monstart", shell=True)
                     logging.info("[Fix_Services monstart]: %s" % repr(cmd_output))
                 except Exception as err:
@@ -235,24 +235,24 @@ class FixServices(plugins.Plugin):
             # main divergence from WATCHDOG starts here
             #
             # instead of rebooting, and losing all that energy loading up the AI
-            #    pause wifi.recon, close wlan0mon, reload the brcmfmac kernel module
-            #    then recreate wlan0mon, ..., and restart wifi.recon
+            #    pause wifi.recon, close mon0, reload the brcmfmac kernel module
+            #    then recreate mon0, ..., and restart wifi.recon
 
             # Turn it off
 
-            # attempt a sanity check. does wlan0mon exist?
+            # attempt a sanity check. does mon0 exist?
             # is it up?
             try:
-                cmd_output = subprocess.check_output("ip link show wlan0mon", shell=True)
-                logging.info("[Fix_Services ip link show wlan0mon]: %s" % repr(cmd_output))
+                cmd_output = subprocess.check_output("ip link show mon0", shell=True)
+                logging.info("[Fix_Services ip link show mon0]: %s" % repr(cmd_output))
                 if ",UP," in str(cmd_output):
-                    logging.info("wlan0mon is up. Skip reset?")
+                    logging.info("mon0 is up. Skip reset?")
                     # not reliable, so don't skip just yet
-                    # print("wlan0mon is up. Skipping reset.")
+                    # print("mon0 is up. Skipping reset.")
                     # self.isReloadingMon = False
                     # return
             except Exception as err:
-                logging.error("[Fix_Services ip link show wlan0mon]: %s" % repr(err))
+                logging.error("[Fix_Services ip link show mon0]: %s" % repr(err))
 
             try:
                 result = connection.run("wifi.recon off")
@@ -267,15 +267,15 @@ class FixServices(plugins.Plugin):
             except Exception as err:
                 logging.error("[Fix_Services wifi.recon off] error  %s" % (repr(err)))
 
-            logging.info("[Fix_Services] recon paused. Now trying wlan0mon reload")
+            logging.info("[Fix_Services] recon paused. Now trying mon0 reload")
 
             try:
                 cmd_output = subprocess.check_output("monstop", shell=True)
                 self._status = "dn"
-                self.logPrintView("info", "[Fix_Services] wlan0mon down and deleted: %s" % cmd_output,
-                                  display, {"status": "wlan0mon d-d-d-down!", "face": faces.BORED})
+                self.logPrintView("info", "[Fix_Services] mon0 down and deleted: %s" % cmd_output,
+                                  display, {"status": "mon0 d-d-d-down!", "face": faces.BORED})
             except Exception as nope:
-                logging.error("[Fix_Services delete wlan0mon] %s" % nope)
+                logging.error("[Fix_Services delete mon0] %s" % nope)
                 pass
 
             logging.debug("[Fix_Services] Now trying modprobe -r")
@@ -306,15 +306,15 @@ class FixServices(plugins.Plugin):
                         # success! now make the mon0
                         try:
                             cmd_output = subprocess.check_output("monstart", shell=True)
-                            self.logPrintView("info", "[Fix_Services interface add wlan0mon] worked #%s: %s"
+                            self.logPrintView("info", "[Fix_Services interface add mon0] worked #%s: %s"
                                               % (tries, cmd_output))
                             self._status = "up"
                             time.sleep(tries + 5)
                             try:
                                 # try accessing mon0 in bettercap
-                                result = connection.run("set wifi.interface wlan0mon")
+                                result = connection.run("set wifi.interface mon0")
                                 if "success" in result:
-                                    logging.info("[Fix_Services set wifi.interface wlan0mon] worked!")
+                                    logging.info("[Fix_Services set wifi.interface mon0] worked!")
                                     self._status = ""
                                     self._count = self._count + 1
                                     time.sleep(1)
@@ -322,13 +322,13 @@ class FixServices(plugins.Plugin):
                                     break
                                 else:
                                     logging.info(
-                                        "[Fix_Services set wifi.interfaceface wlan0mon] failed? %s" % repr(result))
+                                        "[Fix_Services set wifi.interfaceface mon0] failed? %s" % repr(result))
                             except Exception as err:
                                 logging.info(
-                                    "[Fix_Services set wifi.interface wlan0mon] except: %s" % repr(err))
+                                    "[Fix_Services set wifi.interface mon0] except: %s" % repr(err))
                         except Exception as cerr:  #
                             if not display:
-                                print("failed loading wlan0mon attempt #%s: %s" % (tries, repr(cerr)))
+                                print("failed loading mon0 attempt #%s: %s" % (tries, repr(cerr)))
                     except Exception as err:  # from modprobe
                         if not display:
                             print("Failed reloading brcmfmac")
@@ -343,11 +343,11 @@ class FixServices(plugins.Plugin):
 
                 tries = tries + 1
                 if tries < 3:
-                    logging.info("[Fix_Services] wlan0mon didn't make it. trying again")
+                    logging.info("[Fix_Services] mon0 didn't make it. trying again")
                     if not display:
-                        print(" wlan0mon didn't make it. trying again")
+                        print(" mon0 didn't make it. trying again")
                 else:
-                    logging.info("[Fix_Services] wlan0mon loading failed, no choice but to reboot ..")
+                    logging.info("[Fix_Services] mon0 loading failed, no choice but to reboot ..")
                     pwnagotchi.reboot()
 
             # exited the loop, so hopefully it loaded
@@ -358,7 +358,7 @@ class FixServices(plugins.Plugin):
                                                          "face": faces.INTENSE})
                 else:
                     print("And back on again...")
-                logging.info("[Fix_Services] wlan0mon back up")
+                logging.info("[Fix_Services] mon0 back up")
             else:
                 self.LASTTRY = time.time()
 
@@ -405,7 +405,7 @@ class FixServices(plugins.Plugin):
     def on_ui_update(self, ui):
         # update those elements
         if self._status:
-            ui.set('brcmfmac_status', "wlan0mon %s" % self._status)
+            ui.set('brcmfmac_status', "mon0 %s" % self._status)
         else:
             ui.set('brcmfmac_status', "rst#%s" % self._count)
 
@@ -421,7 +421,7 @@ class FixServices(plugins.Plugin):
 
 # run from command line to brute force a reload
 if __name__ == "__main__":
-    print("Performing brcmfmac reload and restart wlan0mon in 5 seconds...")
+    print("Performing brcmfmac reload and restart mon0 in 5 seconds...")
     fb = FixServices()
 
     data = {'Message': "kernel: brcmfmac: brcmf_cfg80211_nexmon_set_channel: Set Channel failed: chspec=1234"}

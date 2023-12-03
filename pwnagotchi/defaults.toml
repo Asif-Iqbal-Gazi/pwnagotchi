@@ -93,7 +93,7 @@ main.plugins.wpa-sec.api_url = "https://wpa-sec.stanev.org"
 main.plugins.wpa-sec.download_results = false
 main.plugins.wpa-sec.whitelist = []
 
-main.iface = "wlan0mon"
+main.iface = "mon0"
 main.mon_start_cmd = "/usr/bin/monstart"
 main.mon_stop_cmd = "/usr/bin/monstop"
 main.mon_max_blind_epochs = 50
