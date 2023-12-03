@@ -4,7 +4,7 @@ Documentation=https://bettercap.org
 Wants=network.target
 
 [Service]
-Environment="LD_LIBRARY_PATH=/usr/local/lib"
+Environment="LD_LIBRARY_PATH=/usr/local/lib/"
 Type=simple
 ExecStart=/usr/bin/bettercap-launcher
 Restart=always
